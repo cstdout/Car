@@ -1,70 +1,97 @@
+#include <iostream>
 #include "vehicle.h"
-Vehicle::Vehicle()
+#include "car.h"
+#include <cstdlib>
+#include <map>
+#include <vector>
+#include <iterator>
+using namespace std;
+
+bool comparePrices(const vector<Vehicle>::iterator& a, const vector<Vehicle>::iterator& b)
 {
-}
-Vehicle::Vehicle(const std::string& manufacturer,
-                 const std::string& model,
-                 uint32_t price,
-                 uint32_t weight,
-                 uint32_t year) : _manufacturer(manufacturer), _model(model), _price(price), _weight(weight), _year(year)
-{
-}
-void Vehicle::setYear(uint32_t year)
-{
-    _year = year;
-}
-void Vehicle::setModel(const std::string &model)
-{
-    _model = model;
-}
-void Vehicle::setPrice(uint32_t price)
-{
-    _price = price;
-}
-void Vehicle::setWeight(uint32_t weight)
-{
-    _weight = weight;
-}
-void Vehicle::setManufacturer(const std::string &manufacturer)
-{
-    _manufacturer = manufacturer;
+    return a->getPrice() < b->getPrice();
 }
 
+int main()
+{
 
-uint32_t Vehicle::getYear() const
-{
-    return _year;
-}
-std::string& Vehicle::getModel() const
-{
-    std::string* s = new std::string(_model);
-    return *s;
-}
-uint32_t Vehicle::getPrice() const
-{
-    return _price;
-}
-uint32_t Vehicle::getWeight() const
-{
-    return _weight;
-}
-std::string& Vehicle::getManufacturer() const
-{
-    std::string* s = new std::string(_manufacturer);
-    return *s;
-}
+    srand(time(0));
 
-std::ostream& operator<<(std::ostream& out, const Vehicle& v)
-{
-    out << v._manufacturer << ' ' << v._model << ' ' << v._weight << ' ' << v._year << ' ' << v._price;
-    return out;
-}
-std::istream& operator>>(std::istream& in, Vehicle& v)
-{
-    in >> v._manufacturer >>  v._model >> v._weight >> v._year >> v._price;
-    return in;
-}
+    map<string, vector<string>> manufacturers;
 
-Vehicle::~Vehicle()
-{
+    manufacturers["Ford Motor Company"] = {
+            "Ford Mustang",
+            "Ford F-150",
+            "Ford Explorer",
+            "Ford Bronco",
+            "Ford Escape",
+            "Ford Edge"
+    };
+
+    manufacturers["General Motors"] = {
+            "Chevrolet Camaro"
+            "Chevrolet Silverado",
+            "Chevrolet Equinox",
+            "Chevrolet Malibu",
+            "GMC Sierra",
+            "Cadillac Escalade",
+            "Cadillac CT5",
+            "Buick Enclave"
+    };
+
+    manufacturers["Chrysler Group"] = {
+            "Dodge Charger",
+            "Dodge Challenger",
+            "Jeep Wrangler",
+            "Jeep Grand Cherokee",
+            "Ram 1500",
+            "Chrysler Pacifica"
+    };
+
+    string keys[] = {"Ford Motor Company", "General Motors", "Chrysler Group"};
+    vector<Car> cars;
+    string manufacturerName;
+    vector<string> models;
+    for(int i = 0; i < 100; ++i)
+    {
+        manufacturerName = keys[rand() % 3];
+        models = manufacturers[manufacturerName];
+        cars.push_back(Car(rand() % 10,
+                           rand() % 100,
+                           manufacturerName,
+                           models[rand() % models.size()],
+                           rand() % 100000,
+                           rand() % 10000,
+                           rand() % 2000));
+    }
+    int maxEnginePower = cars[0].getEnginePower();
+    int index = 0;
+    for(int i = 1; i < 100; ++i)
+    {
+        if ((cars[i].getSeats() == 5) && (cars[i].getEnginePower() > maxEnginePower))
+        {
+            maxEnginePower = cars[i].getEnginePower();
+            index = i;
+        }
+    }
+    cout << cars[index] << endl;
+
+    models.clear();
+
+    vector<Vehicle> v;
+
+    for(int i = 0; i < 100; ++i)
+    {
+        manufacturerName = keys[rand() % 3];
+        models = manufacturers[manufacturerName];
+        v.push_back(Vehicle(manufacturerName,
+                            models[rand() % models.size()],
+                            rand() % 100000,
+                            rand() % 10000,
+                            rand() % 2000));
+    }
+
+    cout << *(max(v.begin(), v.end(), comparePrices)) << endl;
+
+    return 0;
 }
